@@ -1,0 +1,162 @@
+<!-- This code implements the web socket connection between client(web page on a Computer) and a server(raspberry pi) -->
+<!-- It sends data from web page using buttons and Keyboard presses to control the BrickPi robot -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title>Remote Car</title>  
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+  <script src="./jquery.ui.touch-punch.min.js"></script>
+  <script src="./websocket.js"></script>
+</head>
+<body>
+<p> Address for Raspberry Pi： </p>
+    <input type="text" id="url" size="30"  value="192.168.0.110"> 
+    <input id="connect" type="button" value="連接"  />         
+<!-- Creating CAR buttons  on the webpage-->                               
+<input id="accelerate" style="height: 100px; width: 100px; position: absolute; left: 150px; top: 100px" type="button" value="前進" />
+</p>
+
+<p>                                        
+<input id="steer_left" style="height: 100px; width: 100px; position: absolute; left: 50px; top: 200px" type="button" value="左轉"  />
+</p>
+
+<p>                                        
+<input id="stop" style="height: 100px; width: 100px; position: absolute; left: 150px; top: 200px" type="button" value="停止"  />
+</p>
+
+<p>                                        
+<input id="steer_right" style="height: 100px; width: 100px; position: absolute; left: 250px; top: 200px" type="button" value="右轉" />
+</p>
+
+<p>                                        
+<input id="reverse" style="height: 100px; width: 100px; position: absolute; left: 150px; top: 300px" type="button" value="後退" />
+</p>
+
+
+
+
+<p>            
+<!-- Creating ARM buttons  on the webpage--> 
+<div id="leb-claw" style="position: absolute; left: 440px; top: 80px">Angle</div>
+<div id="slider-claw" style="height:300px;position: absolute; left: 450px; top: 100px"></div>
+<div id="leb-waist" style="position: absolute; left: 540px; top: 80px">Acceleration</div>
+<div id="slider-waist" style="height:300px;position: absolute; left: 550px; top: 100px"></div>
+
+
+<div id="output">適用手機模式</div>
+<div id="dialog-confirm" title="提示">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span id="dialog-msg" >Loading...</span></p>
+</div>
+
+</body>
+</html>
+<script>   
+	//setInterval("",1000);
+jQuery(function($)
+{
+ //Check for browser support the websocket
+  if (!("WebSocket" in window)) 
+  {
+    alert("Your browser does not support web sockets");
+  }
+  
+  //Hints
+  $( "#dialog-confirm" ).dialog({
+      autoOpen: false,
+      resizable: false,
+      height:240,
+      modal: true,
+      buttons: {
+        "OK": function() {
+          $( this ).dialog( "close" );
+        }
+      }
+    });
+  
+  //Connect to server
+  $("#connect").on('click',function(e){
+  	var url = $("#url").val();      			// assigns the data(hostname/ip address) entered in the text box
+	var host =  "ws://"+url+":9093/ws"; 	// combines the three string and creates a new string
+     	initWebSocket(host);  
+  });
+  
+  //Button
+    $("#accelerate").on('click',function(e){
+  	  var event = {
+		eventType:8,
+		eventValue:0
+	};
+	doSend(event);
+  });
+    $("#steer_left").on('click',function(e){
+    	  var event = {
+		eventType:6,
+		eventValue:0
+	};
+	doSend(event);
+  });
+    $("#stop").on('click',function(e){
+    	  var event = {
+		eventType:5,
+		eventValue:0
+	};
+	doSend(event);
+  });
+    $("#steer_right").on('click',function(e){
+    	  var event = {
+		eventType:4,
+		eventValue:0
+	};
+	doSend(event);
+  });
+  
+    $("#reverse").on('click',function(e){
+    	  var event = {
+		eventType:2,
+		eventValue:0
+	};
+	doSend(event);
+  });
+  
+  
+  // Slice
+
+  $( "#slider-claw" ).slider({
+      orientation: "vertical",
+      range: "min",
+      min: 0,
+      max: 30,
+      value: 0,
+      slide: function( event, ui ) {
+        //$( "#amount" ).val( ui.value );
+        //alert(ui.value);
+       var event = {
+		eventType:1,
+		eventValue:ui.value
+	};
+	doSend(event);
+      }
+    });
+    
+    $( "#slider-waist" ).slider({
+      orientation: "vertical",
+      range: "min",
+      min: 0,
+      max: 40,
+      value: 0,
+      slide: function( event, ui ) {
+         var event = {
+		eventType:3,
+		eventValue:ui.value
+	};
+	doSend(event);
+      }
+    });
+  
+});
+
+</script>

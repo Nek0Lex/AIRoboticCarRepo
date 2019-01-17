@@ -1,0 +1,111 @@
+<!-- This code implements the web socket connection between client(web page on a Computer) and a server(raspberry pi) -->
+<!-- It sends data from web page using buttons and Keyboard presses to control the Car -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title>ArmRobot Client</title>  
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+  <script src="./jquery.ui.touch-punch.min.js"></script>
+  <script src="./websocket.js"></script>
+</head>
+<body>
+<p> 請輸入Raspberry Pi地址： </p>
+    <input type="text" id="url" size="30"  value="192.168.0.100"> 
+    <input id="connect" type="button" value="連接"  />         
+<!-- Creating CAR buttons  on the webpage-->                               
+<input id="accelerate" style="height: 100px; width: 100px; position: absolute; left: 150px; top: 100px" type="button" value="前進" />
+</p>
+
+<p>                                        
+<input id="steer_left" style="height: 100px; width: 100px; position: absolute; left: 50px; top: 200px" type="button" value="左轉"  />
+</p>
+
+<p>                                        
+<input id="stop" style="height: 100px; width: 100px; position: absolute; left: 150px; top: 200px" type="button" value="停止"  />
+</p>
+
+<p>                                        
+<input id="steer_right" style="height: 100px; width: 100px; position: absolute; left: 250px; top: 200px" type="button" value="右轉" />
+</p>
+
+<p>                                        
+<input id="reverse" style="height: 100px; width: 100px; position: absolute; left: 150px; top: 300px" type="button" value="後退" />
+</p>
+
+</body>
+</html>
+<script>   
+	//setInterval("",1000);
+jQuery(function($)
+{
+ //檢測瀏覽器是否支持websocket
+  if (!("WebSocket" in window)) 
+  {
+    alert("Your browser does not support web sockets");
+  }
+  
+  //提示框
+  $( "#dialog-confirm" ).dialog({
+      autoOpen: false,
+      resizable: false,
+      height:240,
+      modal: true,
+      buttons: {
+        "OK": function() {
+          $( this ).dialog( "close" );
+        }
+      }
+    });
+  
+  //連接服務器
+  $("#connect").on('click',function(e){
+  	var url = $("#url").val();      			// assigns the data(hostname/ip address) entered in the text box
+	var host =  "ws://"+url+":9093/ws"; 	// combines the three string and creates a new string
+     	initWebSocket(host);  
+  });
+  
+  //方向按鈕
+    $("#accelerate").on('click',function(e){
+  	  var event = {
+		eventType:8,
+		eventValue:0
+	};
+	doSend(event);
+  });
+    $("#steer_left").on('click',function(e){
+    	  var event = {
+		eventType:6,
+		eventValue:0
+	};
+	doSend(event);
+  });
+    $("#stop").on('click',function(e){
+    	  var event = {
+		eventType:5,
+		eventValue:0
+	};
+	doSend(event);
+  });
+    $("#steer_right").on('click',function(e){
+    	  var event = {
+		eventType:4,
+		eventValue:0
+	};
+	doSend(event);
+  });
+  
+    $("#reverse").on('click',function(e){
+    	  var event = {
+		eventType:2,
+		eventValue:0
+	};
+	doSend(event);
+  });
+  
+});
+
+</script>
