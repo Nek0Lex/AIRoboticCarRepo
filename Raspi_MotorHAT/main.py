@@ -98,7 +98,7 @@ while True:
             BR.run(Raspi_MotorHAT.FORWARD)
             if keyboard.is_pressed('q'):
                 turnOffMotors()
-                break;
+                break
             
     if keyboard.is_pressed('s'):
         while True:
@@ -108,5 +108,21 @@ while True:
             BR.run(Raspi_MotorHAT.BACKWARD)
             if keyboard.is_pressed('q'):
                 turnOffMotors()
-                break;
+                break
     
+    if keyboard.is_pressed('a'):
+        while True:
+            left()
+            if keyboard.is_pressed('q'):
+                turnOffMotors()
+                break
+    
+    if keyboard.is_pressed('d'):
+        while True:
+            right()
+            if keyboard.is_pressed('q'):
+                turnOffMotors()
+                break
+            
+    if keyboard.is_pressed('z'):
+        break
